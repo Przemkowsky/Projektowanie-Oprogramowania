@@ -1,1 +1,160 @@
 
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class Main {
+
+    // Sprawdza, czy paczka zmieści się w limicie
+    public static boolean czyZemiesci(float aktualnaWaga, float nowaPaczka, float limit) {
+        return aktualnaWaga + nowaPaczka <= limit;
+    }
+
+    // Określa gabaryt i cenę paczki
+    public static void sprawdzGabaryt(float wysokosc) {
+
+        if (wysokosc <= 8.0) {
+            System.out.println("Gabaryt A - 12.00 PLN");
+        } else if (wysokosc <= 19.0) {
+            System.out.println("Gabaryt B - 16.00 PLN");
+        } else if (wysokosc <= 41.0) {
+            System.out.println("Gabaryt C - 20.00 PLN");
+        } else {
+            System.out.println("Odrzucono: Zbyt wysoka paczka (max 41 cm)");
+        }
+    }
+
+    // Raport końcowy
+    public static void raportKoncowy(ArrayList<Float> paczki, float suma, float limit) {
+
+        System.out.println();
+        System.out.println("===== RAPORT KOŃCOWY =====");
+
+        System.out.println("Liczba przyjętych paczek: " + paczki.size());
+
+        System.out.printf("Łączna waga: %.2f kg%n", suma);
+
+        System.out.printf(
+                "Pozostałe wolne miejsce: %.2f kg%n",
+                limit - suma
+        );
+
+        if (paczki.size() == 0) {
+            System.out.println("Nie przyjęto żadnej paczki.");
+            return;
+        }
+
+        float najciezsza = paczki.get(0);
+        float najlzejsza = paczki.get(0);
+
+        // Szukanie najcięższej i najlżejszej paczki
+        for (int i = 1; i < paczki.size(); i++) {
+
+            if (paczki.get(i) > najciezsza) {
+                najciezsza = paczki.get(i);
+            }
+
+            if (paczki.get(i) < najlzejsza) {
+                najlzejsza = paczki.get(i);
+            }
+        }
+
+        float srednia = suma / paczki.size();
+
+        System.out.printf(
+                "Najcięższa paczka: %.2f kg%n",
+                najciezsza
+        );
+
+        System.out.printf(
+                "Najlżejsza paczka: %.2f kg%n",
+                najlzejsza
+        );
+
+        System.out.printf(
+                "Średnia waga paczki: %.2f kg%n",
+                srednia
+        );
+    }
+
+    public static void main(String[] args) {
+
+        Scanner scanner = new Scanner(System.in);
+
+        final float MAX_WAGA = 100.0f;
+
+        float suma = 0.0f;
+
+        ArrayList<Float> paczki = new ArrayList<>();
+
+        while (true) {
+
+            System.out.print("Podaj wysokość paczki [cm]: ");
+            float wysokosc = scanner.nextFloat();
+
+            // Sprawdzanie poprawności wysokości
+            if (wysokosc < 0) {
+                System.out.println("Błąd: wysokość nie może być ujemna!");
+                continue;
+            }
+
+            // 0 kończy program
+            if (wysokosc == 0) {
+                break;
+            }
+
+            System.out.print("Podaj wagę paczki [kg]: ");
+            float waga = scanner.nextFloat();
+
+            // Sprawdzanie poprawności wagi
+            if (waga < 0) {
+                System.out.println(
+                        "Ostrzeżenie: waga paczki nie może być ujemna!"
+                );
+                continue;
+            }
+
+            // Maksymalna waga pojedynczej paczki
+            if (waga > 25.0) {
+                System.out.println(
+                        "Odrzucono: paczka przekracza limit wagi 25 kg."
+                );
+                continue;
+            }
+
+            // Maksymalna wysokość
+            if (wysokosc > 41.0) {
+                System.out.println(
+                        "Odrzucono: zbyt wysoka paczka (max 41 cm)."
+                );
+                continue;
+            }
+
+            // Wyświetlenie gabarytu
+            sprawdzGabaryt(wysokosc);
+
+            // Sprawdzenie limitu całkowitej wagi
+            if (czyZemiesci(suma, waga, MAX_WAGA)) {
+
+                suma += waga;
+
+                paczki.add(waga);
+
+                System.out.printf(
+                        "Przyjęto paczkę. Łączna waga: %.2f kg / 100 kg%n",
+                        suma
+                );
+
+            } else {
+
+                System.out.println(
+                        "Odrzucono: przekroczono limit nośności 100 kg!"
+                );
+            }
+        }
+
+        // Wyświetlenie raportu
+        raportKoncowy(paczki, suma, MAX_WAGA);
+
+        scanner.close();
+    }
+}
